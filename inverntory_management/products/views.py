@@ -1,10 +1,9 @@
 
-from .forms.product_form import ProductForm
 from django.http.response import JsonResponse
-from products.models import Product
 from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from django.template.loader import render_to_string
+from django.contrib.auth.decorators import login_required
 
 from products.models import Product
 from django.shortcuts import render
@@ -13,12 +12,13 @@ from django.template.loader import render_to_string
 
 
 
+@login_required(login_url='/accounts/login')
 def index(request):
     products = Product.objects.order_by('-created_at')
     context = {"products": products}
     return render(request, 'products/index.html', context)
 
-
+@login_required(login_url='/accounts/login/')
 def detail(request, prod_id):
     try:
         product = Product.objects.get(pk=prod_id)
@@ -27,6 +27,7 @@ def detail(request, prod_id):
 
     return render(request, 'products/details.html', {'prod': product})
 
+@login_required(login_url='/accounts/login')
 def product_search(request):
     url_param = request.GET.get('q')
     if url_param:
@@ -63,6 +64,7 @@ def product_search(request):
     data_dict = {'html_from_view': data}
     return JsonResponse(data=data_dict, safe=False)
 
+@login_required(login_url='/accounts/login')
 def update_product(request):
     # id = request.post.get('id')
     # prod = Product.objects.get(pk=id)
@@ -87,13 +89,16 @@ def update_product(request):
         form = ProductForm(instance=prod)
         return render(request, 'products/edit.html', {'form': form, 'ctx':str(id)})
 
+@login_required(login_url='/accounts/login')
 def add_product(request):
     if request.method == 'POST':
         # create a form instance and populate it with data from the request:
         form = ProductForm(request.POST)
         # check whether it's valid:
         if form.is_valid():
-            form.save()
+            new_product = form.save(commit=False)
+            new_product.created_by = request.user
+            new_product.save()
             return redirect('/products/')
     else:
         form = ProductForm()
