@@ -1,8 +1,13 @@
+
 from django.http.response import JsonResponse
 from products.models import Product
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template.loader import render_to_string
+
+from products.models import Product
+from django.shortcuts import render
+from django.http import HttpResponse
 
 
 def index(request):
