@@ -1,11 +1,19 @@
 {% if products %}
-<ul>
+<table class='table table-dark'>
+<tr>
+    <th>Product Name</th>
+    <th>Edit</th> 
+    <th>Delete</th>
+  </tr>
   {% for prod in products %}
-  <li>
-    <a href="{% url 'products:detail' prod.id %}">{{ prod.name }}</a>
-  </li>
-  {% endfor %}
-</ul>
+  <tr >
+    <td class="text-center"><a href="{% url 'products:detail' prod.id %}">{{ prod.name }}</a></td>
+    <td class="text-center"><a class='btn btn-warning' href="update/?q={{prod.id}}">Edit</a></td> 
+    <td class="text-center"><button class='btn btn-danger' onclick="del({{prod.id}})">Delete</button></td>
+  </tr>
+    {% endfor %}
+</table>
+
 {% else %}
 <p>No products are available.</p>
 {% endif %}

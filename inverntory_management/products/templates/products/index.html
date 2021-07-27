@@ -1,58 +1,80 @@
 <!DOCTYPE html>
 <html>
-
-<head>
+  <head>
     <meta charset="utf-8" />
     <title>Products</title>
-</head>
-
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    </meta>
+  </head>
 <body>
     <div class="container">
-            <div class="row">
-                <div class="offset-4 form-group col-4">
-                    <label class="col-12">Search Product</label>
-                    <input type="text" id="user-input" />
-                </div>
-            </div>
-        <div id="replaceable-content">
-            {% include 'products/products_partial.html' %}
+      <div class="row">
+        <div class="col text-center">
+          <a class='btn btn-primary align-center mt-2' href="/products/add" >Add New Product</a>
         </div>
-
+      </div>
+   
+      <div class="row">
+        <div class="col text-center">
+          <label for='user-input' class="col-12 mt-2">Search Product</label>
+          <input type="text" class="mb-2" id="user-input" name='user-input' />
+        </div>
+      </div>
+      <div id="replaceable-content">
+        {% include 'products/products_partial.html' %}
+      </div>
     </div>
-</body>
-{% comment %} <script type="text/javascript" src="{{ STATIC_URL }} /static/jquery-3.6.0.min.js"></script> {% endcomment %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  </body>
+  {% comment %}
+  <script
+    type="text/javascript"
+    src="{{ STATIC_URL }} /static/jquery-3.6.0.min.js"
+  ></script>
+  {% endcomment %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 
-<script>
-const user_input = $("#user-input")
-const products_div = $('#replaceable-content')
-const endpoint = '/products/search'
-const delay_by_in_ms = 700
-let scheduled_function = false
+  <script>
+    const user_input = $("#user-input");
+    const products_div = $("#replaceable-content");
+    const endpoint = "/products/search";
+    const delay_by_in_ms = 700;
+    let scheduled_function = false;
 
-let ajax_call = function (endpoint, request_parameters)
-{
-    $.getJSON(endpoint, request_parameters)
-        .done(response => {
-            products_div.html(response['html_from_view'])
+    let ajax_call = function (endpoint, request_parameters) {
+      $.getJSON(endpoint, request_parameters).done((response) => {
+        products_div.html(response["html_from_view"]);
+      });
+    };
+
+    user_input.on("keyup", function () {
+      const request_parameters = {
+        q: $(this).val(),
+      };
+
+      // if scheduled_function is NOT false, cancel the execution of the function
+      if (scheduled_function) {
+        clearTimeout(scheduled_function);
+      }
+      scheduled_function = setTimeout(
+        ajax_call,
+        delay_by_in_ms,
+        endpoint,
+        request_parameters
+      );
+    });
+
+
+    function del(id) {
+      var result = confirm("Are you sure...? You want to delete this Product?");
+      if (result) {
+        $.getJSON("/products/delete", { q: id }).done((response) => {
+          products_div.html(response["html_from_view"]);
         });
-}
-
-user_input.on('keyup', function () {
-
-    const request_parameters = {
-        q: $(this).val()
+      }
     }
-    
-    // if scheduled_function is NOT false, cancel the execution of the function
-    if (scheduled_function) {
-        clearTimeout(scheduled_function)
-    }
-     scheduled_function = setTimeout(ajax_call, delay_by_in_ms, endpoint, request_parameters)
-})
-
-</script
-
+  </script>
 </html>
